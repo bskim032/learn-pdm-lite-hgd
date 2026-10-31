@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>예지보전 실습판</title>
+<style>
+:root{--bg:#fff;--fg:#1f2328;--mute:#59636e;--line:#d1d9e0}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1117;--fg:#e6edf3;--mute:#9198a1;--line:#3d444d}}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,"Malgun Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:16px}
+h1{font-size:1.15rem;line-height:1.5;margin:8px 0 12px}
+.chart{position:relative;height:340px}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:14px}
+th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left}
+.scroll{overflow-x:auto}
+.note{color:var(--mute);font-size:.8rem;line-height:1.6;margin-top:10px}
+</style></head><body><main>
+<h1>설비B는 온도가 13:00부터 추세적으로 올랐다(진동은 15:00부터) — 설비A 진동 3.5는 한 번 튄 노이즈</h1>
+<div class="chart"><canvas id="c"></canvas></div>
+<div class="scroll"><table><tr><th>설비</th><th>항목</th><th>기준선 상한</th><th>상한 초과</th><th>판정</th><th>추세 시작</th></tr><tr><td>설비A(프레스 메인모터)</td><td>진동(mm/s)</td><td>1.14</td><td>1</td><td>노이즈</td><td>—</td></tr><tr><td>설비B(차체 용접로봇 감속기)</td><td>진동(mm/s)</td><td>1.12</td><td>5</td><td>추세</td><td>15:00</td></tr><tr><td>설비B(차체 용접로봇 감속기)</td><td>온도(℃)</td><td>57.0</td><td>10</td><td>추세</td><td>13:00</td></tr></table></div>
+<p class="note">판정 규칙: 설비·항목마다 처음 12점(08:00~11:40)의 평균 + 3σ를 기준선 상한으로 두고, 3번 연속 넘으면 추세(첫 점 = 추세 시작), 연속 3번 미만이면 노이즈.<br>
+실습용 가상 데이터 · 출처: <a href="https://github.com/keerhee/kma-auto-genai-3-1">keerhee/kma-auto-genai-3-1</a> data/Day5/Day5_설비센서_50건_가상.csv · 2026-09-15 08:00~16:00, 20분 간격 · 원본 강의 Day5 예지보전 ④ 분석 1</p>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const D={"t": ["08:00", "08:20", "08:40", "09:00", "09:20", "09:40", "10:00", "10:20", "10:40", "11:00", "11:20", "11:40", "12:00", "12:20", "12:40", "13:00", "13:20", "13:40", "14:00", "14:20", "14:40", "15:00", "15:20", "15:40", "16:00"], "a_vib": [0.99, 1.05, 0.92, 0.93, 1.05, 1.0, 0.93, 0.96, 0.93, 0.96, 1.06, 1.0, 1.1, 0.9, 3.5, 1.0, 1.04, 0.94, 1.06, 1.06, 1.02, 1.03, 0.99, 0.93, 1.03], "b_vib": [0.94, 1.05, 1.03, 1.03, 1.05, 1.0, 1.05, 1.01, 1.01, 0.96, 1.02, 1.01, 1.04, 1.04, 1.06, 1.05, 1.08, 1.1, 1.12, 1.09, 1.0, 1.3, 1.7, 2.2, 2.9], "b_temp": [55.6, 54.6, 55.5, 55.8, 55.8, 55.3, 55.7, 54.8, 54.1, 55.7, 55.4, 55.8, 54.3, 55.4, 56.7, 58.2, 57.8, 59.3, 60.9, 60.7, 61.4, 63.3, 63.3, 64.0, 65.1], "b_temp_ul": 57.0};
+const dark=matchMedia('(prefers-color-scheme: dark)').matches;
+Chart.defaults.color=dark?'#9198a1':'#59636e';
+new Chart(document.getElementById('c'),{type:'line',data:{labels:D.t,datasets:[
+{label:'설비A 진동 (mm/s)',data:D.a_vib,borderColor:'#8c959f',backgroundColor:'#8c959f',yAxisID:'v',pointRadius:2},
+{label:'설비B 진동 (mm/s)',data:D.b_vib,borderColor:'#0969da',backgroundColor:'#0969da',yAxisID:'v',pointRadius:2},
+{label:'설비B 온도 (℃)',data:D.b_temp,borderColor:'#cf222e',backgroundColor:'#cf222e',yAxisID:'t',pointRadius:2},
+{label:'설비B 온도 기준선 상한 '+D.b_temp_ul.toFixed(1)+' ℃',data:D.t.map(()=>D.b_temp_ul),borderColor:'#cf222e',borderDash:[5,4],borderWidth:1,pointRadius:0,yAxisID:'t'}]},
+options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+scales:{v:{position:'left',beginAtZero:true,title:{display:true,text:'진동 (mm/s)'}},
+t:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:true,text:'온도 (℃)'}}},
+plugins:{legend:{position:'bottom',labels:{boxWidth:12}}}}});
+</script></body></html>

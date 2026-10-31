@@ -1,0 +1,29 @@
+{
+ "values": {
+  "a_vib_over_count": {
+   "value": 1,
+   "decimals": 0,
+   "block": 1
+  },
+  "a_vib_verdict": {
+   "value": "노이즈",
+   "decimals": null,
+   "block": 1
+  },
+  "b_temp_upper": {
+   "value": 57.0,
+   "decimals": 1,
+   "block": 1
+  },
+  "b_temp_trend_start": {
+   "value": "13:00",
+   "decimals": null,
+   "block": 1
+  },
+  "b_vib_trend_start": {
+   "value": "15:00",
+   "decimals": null,
+   "block": 1
+  }
+ }
+}
